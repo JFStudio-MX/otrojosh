@@ -47,6 +47,9 @@
     "sameAs": [
       "https://open.spotify.com/artist/7BhSQcfV9sFf2OWyV0TE2d",
       "https://music.apple.com/mx/artist/otro-josh/6812545094",
+      "https://music.youtube.com/channel/UCNSaYgdAx8HLQmBVerMoVSg",
+      "https://www.deezer.com/artist/416774542",
+      "https://www.youtube.com/@OtroJosh",
       "https://www.instagram.com/otro_josh/"
     ]
   },
@@ -243,6 +246,22 @@ section{ position:relative; padding:clamp(88px,14vh,170px) var(--pad) }
 .listen__note{ margin-top:14px }
 @media (min-width:900px){ .listen__grid{ grid-template-columns:1.1fr .9fr; align-items:start } }
 
+/* ---------- visualizer ---------- */
+.vis__head{ display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; margin-bottom:clamp(24px,4vh,40px) }
+.vis__frame{ position:relative; aspect-ratio:16/9; overflow:hidden; background:var(--room); border-radius:6px }
+.vis__frame iframe{ position:absolute; inset:0; width:100%; height:100%; border:0 }
+.vis__play{ position:absolute; inset:0; width:100%; padding:0; border:0; cursor:pointer; background:#000; color:var(--paper); display:grid; place-items:center }
+.vis__play img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:grayscale(1) contrast(1.15) brightness(.5); transition:transform 1.2s var(--ease), filter var(--base) }
+.vis__play::before{ content:""; position:absolute; inset:0; z-index:1; background:radial-gradient(60% 80% at 50% 50%,rgba(240,162,74,.55),rgba(240,162,74,.18) 60%,rgba(7,10,18,.85)); mix-blend-mode:color }
+.vis__play::after{ content:""; position:absolute; inset:0; z-index:1; background:linear-gradient(180deg,transparent 40%,rgba(7,10,18,.85)) }
+.vis__play:hover img{ transform:scale(1.03); filter:grayscale(1) contrast(1.15) brightness(.62) }
+.vis__btn{ position:relative; z-index:2; width:clamp(64px,9vw,96px); aspect-ratio:1; border-radius:50%; background:var(--glow); color:var(--night); display:grid; place-items:center; box-shadow:0 0 60px rgba(240,162,74,.55); transition:transform var(--base) var(--ease) }
+.vis__play:hover .vis__btn{ transform:scale(1.08) }
+.vis__btn svg{ width:34%; height:34%; margin-left:6% }
+.vis__cap{ position:absolute; z-index:2; left:clamp(16px,3vw,32px); right:clamp(16px,3vw,32px); bottom:clamp(14px,2.6vw,28px); display:flex; justify-content:space-between; gap:12px; text-align:left }
+.vis__cap .meta{ color:var(--paper); opacity:.8 }
+@media (max-width:520px){ .vis__cap .meta:last-child{ display:none } }
+
 /* ---------- tracklist ---------- */
 .album{ background:linear-gradient(180deg,var(--night),var(--room) 45%,var(--night)) }
 .album__grid{ display:grid; grid-template-columns:1fr; gap:clamp(36px,5vw,90px) }
@@ -422,6 +441,9 @@ footer{ padding:clamp(70px,10vh,110px) var(--pad) calc(36px + var(--safe-b)); bo
   <symbol id="i-spotify" viewBox="0 0 24 24"><path fill="currentColor" d="M12 1.5A10.5 10.5 0 1 0 22.5 12 10.5 10.5 0 0 0 12 1.5Zm4.8 15.15a.66.66 0 0 1-.9.22c-2.47-1.5-5.58-1.85-9.24-1.01a.66.66 0 1 1-.3-1.28c4-.92 7.44-.52 10.22 1.17a.66.66 0 0 1 .22.9Zm1.29-2.86a.82.82 0 0 1-1.13.27c-2.83-1.74-7.14-2.24-10.48-1.23a.82.82 0 1 1-.48-1.57c3.82-1.16 8.57-.6 11.82 1.4a.82.82 0 0 1 .27 1.13Zm.11-2.98C14.81 8.8 9.2 8.61 5.95 9.6a.99.99 0 1 1-.57-1.89c3.73-1.13 9.93-.91 13.84 1.41a.99.99 0 0 1-1.02 1.7Z"/></symbol>
   <symbol id="i-apple" viewBox="0 0 24 24"><path fill="currentColor" d="M19.5 3.2v12.1a3.1 3.1 0 1 1-2-2.9V7.6l-8 1.7v8.4a3.1 3.1 0 1 1-2-2.9V5.5Z"/></symbol>
   <symbol id="i-amazon" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M3 15.5c5 3.2 12.4 3.4 18 0M18 13.6l3 1.9-1 3.2"/><path fill="currentColor" d="M7 5h2.2l2.3 6.2L13.8 5H16v8h-1.7V8l-2.1 5h-1.4L8.7 8v5H7Z"/></symbol>
+  <symbol id="i-ytm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.6" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="5.4" fill="none" stroke="currentColor" stroke-width="1.4"/><path fill="currentColor" d="M10.4 9.6v4.8l4-2.4Z"/></symbol>
+  <symbol id="i-deezer" viewBox="0 0 24 24"><path fill="currentColor" d="M2 16h4v2.5H2Zm5.3 0h4v2.5h-4Zm5.4 0h4v2.5h-4Zm5.3 0h4v2.5h-4Zm-5.3-3.3h4v2.5h-4Zm5.3 0h4v2.5h-4Zm-10.7 0h4v2.5h-4Zm10.7-3.3h4v2.5h-4Zm-5.3 0h4v2.5h-4Zm5.3-3.3h4v2.5h-4Z"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M6 3.5v17L20 12Z"/></symbol>
   <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="19" cy="12" r="2" fill="currentColor"/></symbol>
   <symbol id="i-arrow" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.6" d="M7 17 17 7M8 7h9v9"/></symbol>
 </svg>
@@ -431,6 +453,7 @@ footer{ padding:clamp(70px,10vh,110px) var(--pad) calc(36px + var(--safe-b)); bo
   <ul>
     <li><a href="#escuchar">Escuchar</a></li>
     <li><a href="#album">G.E.M.</a></li>
+    <li><a href="#visualizer">Visualizer</a></li>
     <li><a href="#era">Sencillos</a></li>
     <li><a href="#bio">Bio</a></li>
   </ul>
@@ -497,11 +520,17 @@ footer{ padding:clamp(70px,10vh,110px) var(--pad) calc(36px + var(--safe-b)); bo
           <li class="rv d1"><a data-link="apple" href="#" target="_blank" rel="noopener">
             <svg aria-hidden="true"><use href="#i-apple"/></svg><span class="name">Apple Music</span>
             <span class="meta act"><span class="state-pre">Pre-add</span><span class="state-out">Escuchar</span> ↗</span></a></li>
+          <li class="rv d1"><a data-link="ytmusic" href="#" target="_blank" rel="noopener">
+            <svg aria-hidden="true"><use href="#i-ytm"/></svg><span class="name">YouTube Music</span>
+            <span class="meta act">Escuchar ↗</span></a></li>
+          <li class="rv d2"><a data-link="deezer" href="#" target="_blank" rel="noopener">
+            <svg aria-hidden="true"><use href="#i-deezer"/></svg><span class="name">Deezer</span>
+            <span class="meta act">Escuchar ↗</span></a></li>
           <li class="rv d2"><a data-link="amazon" href="#" target="_blank" rel="noopener">
             <svg aria-hidden="true"><use href="#i-amazon"/></svg><span class="name">Amazon Music</span>
             <span class="meta act">Escuchar ↗</span></a></li>
           <li class="rv d3"><a data-link="all" href="#" target="_blank" rel="noopener">
-            <svg aria-hidden="true"><use href="#i-more"/></svg><span class="name">YouTube Music, Deezer, Tidal…</span>
+            <svg aria-hidden="true"><use href="#i-more"/></svg><span class="name">Tidal y más tiendas</span>
             <span class="meta act">Todas ↗</span></a></li>
         </ul>
       </div>
@@ -545,6 +574,26 @@ footer{ padding:clamp(70px,10vh,110px) var(--pad) calc(36px + var(--safe-b)); bo
   </div>
 </section>
 
+<!-- ============ VISUALIZER ============ -->
+<section id="visualizer">
+  <div class="wrap">
+    <div class="vis__head">
+      <div>
+        <p class="meta rv" style="margin-bottom:18px">El álbum completo · 41:52</p>
+        <h2 class="h2 rv d1">Visualizer</h2>
+      </div>
+      <a class="btn btn--ghost rv d2" data-link="youtube" href="#" target="_blank" rel="noopener">YouTube ↗</a>
+    </div>
+    <div class="vis__frame rv d1" id="vis">
+      <button class="vis__play" type="button" id="visPlay" aria-label="Reproducir G.E.M. Visualizer en YouTube">
+        <img src="assets/visualizer.jpg" alt="" loading="lazy" width="1280" height="720">
+        <span class="vis__btn"><svg aria-hidden="true"><use href="#i-play"/></svg></span>
+        <span class="vis__cap"><span class="meta">OTRO JOSH — G.E.M. Visualizer</span><span class="meta">13 canciones</span></span>
+      </button>
+    </div>
+  </div>
+</section>
+
 <!-- ============ LA ERA ============ -->
 <section id="era">
   <div class="wrap">
@@ -583,6 +632,8 @@ footer{ padding:clamp(70px,10vh,110px) var(--pad) calc(36px + var(--safe-b)); bo
       <ul>
         <li><a data-link="spotify-artist" href="#" target="_blank" rel="noopener">Spotify</a></li>
         <li><a data-link="apple-artist" href="#" target="_blank" rel="noopener">Apple Music</a></li>
+        <li><a data-link="ytmusic" href="#" target="_blank" rel="noopener">YouTube Music</a></li>
+        <li><a data-link="deezer" href="#" target="_blank" rel="noopener">Deezer</a></li>
         <li><a data-link="amazon" href="#" target="_blank" rel="noopener">Amazon Music</a></li>
         <li><a data-link="all" href="#" target="_blank" rel="noopener">Todas las plataformas</a></li>
       </ul>
@@ -591,12 +642,14 @@ footer{ padding:clamp(70px,10vh,110px) var(--pad) calc(36px + var(--safe-b)); bo
       <h4 class="meta">Seguir</h4>
       <ul>
         <li><a href="https://www.instagram.com/otro_josh/" target="_blank" rel="noopener">Instagram</a></li>
+        <li><a data-link="youtube" href="#" target="_blank" rel="noopener">YouTube</a></li>
       </ul>
     </div>
     <div class="foot__col">
       <h4 class="meta">G.E.M.</h4>
       <ul>
         <li><a href="#album">Tracklist</a></li>
+        <li><a href="#visualizer">Visualizer</a></li>
         <li><a href="#era">Sencillos</a></li>
       </ul>
     </div>
@@ -638,6 +691,10 @@ const LINKS = {
   appleAlbum:    "https://music.apple.com/mx/album/g-e-m/6814212366",
   appleArtist:   "https://music.apple.com/mx/artist/otro-josh/6812545094",
   amazon:        "https://www.amazon.com/gp/product/B0HKFZMPL9",
+  ytmusic:       "https://music.youtube.com/channel/UCNSaYgdAx8HLQmBVerMoVSg",
+  deezer:        "https://www.deezer.com/artist/416774542",
+  youtube:       "https://www.youtube.com/@OtroJosh",
+  visualizer:    "R2f1eRt8OQg",                                       // id del video en YouTube
   hyperfollow:   "https://distrokid.com/hyperfollow/otrojosh/gem",   // pre-save + todas las tiendas
 };
 
@@ -666,6 +723,9 @@ function applyLinks(){
     "spotify": spotify,
     "apple": LINKS.appleAlbum,
     "amazon": LINKS.amazon,
+    "ytmusic": LINKS.ytmusic,
+    "deezer": LINKS.deezer,
+    "youtube": LINKS.youtube,
     "all": LINKS.hyperfollow,
     "spotify-artist": LINKS.spotifyArtist,
     "apple-artist": LINKS.appleArtist,
@@ -694,6 +754,12 @@ document.getElementById("releases").innerHTML = RELEASES.map(r=>`
     <span class="rel__line"><span class="rel__title">${r.title}</span></span>
     <span class="meta">${r.type}</span>
   </a>`).join("");
+
+// visualizer: el iframe de YouTube carga solo al darle play
+document.getElementById("visPlay").addEventListener("click", ()=>{
+  document.getElementById("vis").innerHTML =
+    `<iframe src="https://www.youtube-nocookie.com/embed/${LINKS.visualizer}?autoplay=1&rel=0" title="OTRO JOSH — G.E.M. Visualizer" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+});
 
 /* ---------- estado: antes / después de medianoche ---------- */
 const pad = n => String(n).padStart(2,"0");
