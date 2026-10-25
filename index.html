@@ -394,10 +394,21 @@ footer{ padding:clamp(70px,10vh,110px) var(--pad) calc(36px + var(--safe-b)); bo
 .launch__track .meta{ color:var(--paper); opacity:.75 }
 @keyframes slide{
   0%  { opacity:0; transform:translateY(22px) scale(1.04); filter:blur(14px); letter-spacing:.06em }
-  24% { opacity:1; transform:none; filter:blur(0); letter-spacing:-.025em }
-  76% { opacity:1; transform:none; filter:blur(0) }
+  18% { opacity:1; transform:none; filter:blur(0); letter-spacing:-.025em }
+  82% { opacity:1; transform:none; filter:blur(0) }
   100%{ opacity:0; transform:translateY(-18px) scale(.98); filter:blur(8px) }
 }
+/* sonido */
+.sound{
+  display:inline-flex; align-items:center; gap:9px; background:none; border:0; padding:6px 0; cursor:pointer;
+  font-family:"JetBrains Mono",monospace; font-size:.66rem; letter-spacing:.16em; text-transform:uppercase; color:var(--soft);
+  transition:color var(--fast);
+}
+.sound:hover,.sound[aria-pressed="true"]{ color:var(--glow) }
+.sound svg{ width:17px; height:17px; flex:none }
+.sound .on{ display:none } .sound[aria-pressed="true"] .on{ display:inline } .sound[aria-pressed="true"] .off{ display:none }
+.launch__sound{ position:absolute; left:var(--pad); bottom:calc(22px + var(--safe-b)); padding:10px 4px; color:var(--paper) }
+.reduce .sound{ display:none!important }
 .launch__ticks{
   position:absolute; left:50%; bottom:calc(64px + var(--safe-b)); transform:translateX(-50%);
   display:flex; gap:6px; transition:opacity 700ms var(--ease);
@@ -473,6 +484,10 @@ window.RELEASE_AT = "2026-10-25T00:00:00-06:00";   // medianoche CDMX
   <div class="launch__word" id="launchWord"><span>G</span><i></i><span>E</span><i></i><span>M</span><i></i></div>
   <p class="meta launch__sub" id="launchSub">Ya disponible</p>
   <button class="meta launch__skip" type="button" id="launchSkip">Saltar →</button>
+  <button class="sound launch__sound" type="button" id="launchSound" aria-pressed="false">
+    <svg aria-hidden="true"><use href="#i-sound"/></svg><span class="off">Activar sonido</span><span class="on">Silenciar</span>
+  </button>
+  <audio id="launchAudio" src="assets/encendido.mp3" preload="none"></audio>
 </div>
 <p class="sr" id="live" aria-live="polite"></p>
 
@@ -483,6 +498,7 @@ window.RELEASE_AT = "2026-10-25T00:00:00-06:00";   // medianoche CDMX
   <symbol id="i-amazon" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M3 15.5c5 3.2 12.4 3.4 18 0M18 13.6l3 1.9-1 3.2"/><path fill="currentColor" d="M7 5h2.2l2.3 6.2L13.8 5H16v8h-1.7V8l-2.1 5h-1.4L8.7 8v5H7Z"/></symbol>
   <symbol id="i-ytm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.6" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="5.4" fill="none" stroke="currentColor" stroke-width="1.4"/><path fill="currentColor" d="M10.4 9.6v4.8l4-2.4Z"/></symbol>
   <symbol id="i-deezer" viewBox="0 0 24 24"><path fill="currentColor" d="M2 16h4v2.5H2Zm5.3 0h4v2.5h-4Zm5.4 0h4v2.5h-4Zm5.3 0h4v2.5h-4Zm-5.3-3.3h4v2.5h-4Zm5.3 0h4v2.5h-4Zm-10.7 0h4v2.5h-4Zm10.7-3.3h4v2.5h-4Zm-5.3 0h4v2.5h-4Zm5.3-3.3h4v2.5h-4Z"/></symbol>
+  <symbol id="i-sound" viewBox="0 0 24 24"><path fill="currentColor" d="M3 9.5h4l5-4v13l-5-4H3Z"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M15.5 9a4.5 4.5 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/></symbol>
   <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M6 3.5v17L20 12Z"/></symbol>
   <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="19" cy="12" r="2" fill="currentColor"/></symbol>
   <symbol id="i-arrow" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.6" d="M7 17 17 7M8 7h9v9"/></symbol>
@@ -531,6 +547,11 @@ window.RELEASE_AT = "2026-10-25T00:00:00-06:00";   // medianoche CDMX
           <span class="state-pre">Otras plataformas</span><span class="state-out">Todas las plataformas</span>
         </a>
       </div>
+
+      <button class="sound state-pre rv d3" type="button" id="soundBtn" aria-pressed="false">
+        <svg aria-hidden="true"><use href="#i-sound"/></svg>
+        <span class="off">Activar sonido para el encendido de las 00:00</span><span class="on">Sonido activado para las 00:00</span>
+      </button>
     </div>
 
     <div class="cover rv">
@@ -748,6 +769,7 @@ const RELEASES = [
 
 /* ============================================================ */
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+if(reduce) document.documentElement.classList.add("reduce");
 
 // ?t=pre / ?t=out para previsualizar ambos estados; ?t=launch simula la medianoche en 12 s
 const force = new URLSearchParams(location.search).get("t");
@@ -839,8 +861,8 @@ function tick(){
    t < 0      3 · 2 · 1
    0–900      el filamento parpadea, como foco de tungsteno
    700–2600   la luz florece; entran los listones de cristal líquido
-   2400–~9400 las 13 canciones pasan una por una (cada vez más rápido);
-              la luz late en cada cambio
+   2400–~32k  las 13 canciones pasan una por una, cada una con su escena
+              y su fragmento (assets/encendido.mp3, si el sonido está activo)
    GEM        G · E · M se arman y sus puntos se prenden uno por uno
    SWITCH     detrás del telón, la página pasa a "ya disponible"
    REVEAL     la luz se abre desde la lámpara de la portada y se funde
@@ -859,9 +881,10 @@ const L = {
 const SONGS = [...document.querySelectorAll("#tracks li")].map(li=>({
   t: li.querySelector(".t").textContent, single: li.classList.contains("single"),
 }));
-// tiempos: cada canción dura menos que la anterior (980 ms → 640 ms)
+// tiempos: cada canción dura un poco menos que la anterior (2480 ms → 2140 ms)
+// ojo: tools/build-encendido-audio.py usa estos mismos tiempos para el audio
 const SL = 2400;
-const DURS = SONGS.map((_, i)=>Math.round(980 - i*340/(SONGS.length-1)));
+const DURS = SONGS.map((_, i)=>Math.round(2480 - i*340/(SONGS.length-1)));
 const STARTS = DURS.map((_, i)=>SL + DURS.slice(0,i).reduce((a,b)=>a+b, 0));
 const GEM = STARTS[STARTS.length-1] + DURS[DURS.length-1] + 200;
 const SWITCH = GEM + 2900, REVEAL = SWITCH + 400, END = REVEAL + 1750;
@@ -960,9 +983,42 @@ const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
 const easeOut = v => 1 - Math.pow(1 - clamp01(v), 3);
 const easeInOut = v => (v = clamp01(v), v < .5 ? 4*v*v*v : 1 - Math.pow(-2*v + 2, 3)/2);
 
+/* ---------- sonido: un solo mp3 con los fragmentos, sincronizado con t ---------- */
+const audio = document.getElementById("launchAudio");
+let soundOn = false, audioStarting = false;
+function setSound(on){
+  soundOn = on;
+  document.querySelectorAll(".sound").forEach(b=>b.setAttribute("aria-pressed", String(on)));
+  if(on && audio.preload !== "auto"){ audio.preload = "auto"; audio.load(); }
+  if(!on){ audio.pause(); audioStarting = false; }
+}
+// el navegador solo deja sonar audio después de un toque: se "desbloquea" dentro del gesto
+function primeAudio(){
+  audio.muted = true;
+  const p = audio.play();
+  if(p) p.then(()=>{ if(!(launching && L.now() >= 0)) audio.pause(); audio.muted = false; })
+         .catch(()=>{ audio.muted = false; });
+}
+function startAudio(t){
+  audio.currentTime = t/1000;
+  audioStarting = true;
+  audio.play().then(()=>{ audioStarting = false; }).catch(()=>{ audioStarting = false; setSound(false); });
+}
+document.getElementById("soundBtn").addEventListener("click", ()=>{
+  setSound(!soundOn);
+  if(soundOn) primeAudio();
+});
+document.getElementById("launchSound").addEventListener("click", e=>{
+  e.stopPropagation();                       // el telón usa el clic para "saltar"
+  setSound(!soundOn);
+  if(soundOn){ L.now() >= 0 ? startAudio(L.now()) : primeAudio(); }
+});
+
 function startLaunch(zeroAt, replay = false){
   launching = true;
   let zero = zeroAt, switched = false, lastN = null, origin = null;
+  L.now = () => Date.now() - zero;
+  audio.pause(); audioStarting = false;
   const ctx = L.cv.getContext("2d");
   const dpr = Math.min(devicePixelRatio || 1, 1.5);
   let W = 0, H = 0;
@@ -1105,6 +1161,12 @@ function startLaunch(zeroAt, replay = false){
     if(!launching) return;
     const t = Date.now() - zero;
 
+    // el audio sigue al reloj de la animación (y se re-sincroniza si se desfasa o si se salta)
+    if(soundOn && t >= 0 && t < END - 150){
+      if(audio.paused){ if(!audioStarting) startAudio(t); }
+      else if(Math.abs(audio.currentTime*1000 - t) > 250) audio.currentTime = t/1000;
+    }
+
     // 3 · 2 · 1
     const n = t < 0 ? Math.ceil(-t/1000) : 0;
     if(n !== lastN){
@@ -1123,7 +1185,7 @@ function startLaunch(zeroAt, replay = false){
         const s = SONGS[idx];
         const el = document.createElement("div");
         el.className = "slide" + (s.single ? " single" : "");
-        el.style.setProperty("--d", `${DURS[idx] + 260}ms`);
+        el.style.setProperty("--d", `${DURS[idx] + 500}ms`);
         el.innerHTML = `<span class="meta">${pad(idx+1)} / ${SONGS.length}</span><span class="t">${s.t}</span>`;
         el.addEventListener("animationend", ()=>el.remove());
         L.track.appendChild(el);
@@ -1169,6 +1231,7 @@ function startLaunch(zeroAt, replay = false){
 
   function end(){
     launching = false;
+    audio.pause(); audioStarting = false;
     L.el.classList.remove("on","vis");
     L.el.style.opacity = L.el.style.transition = "";
     removeEventListener("resize", size);
@@ -1190,6 +1253,7 @@ function startLaunch(zeroAt, replay = false){
 document.getElementById("replay").addEventListener("click", ()=>{
   if(launching) return;
   if(reduce){ root.classList.remove("is-out"); setTimeout(()=>setOut(true), 600); return; }
+  setSound(true); primeAudio();               // "ver el encendido" ya es un toque: puede sonar
   startLaunch(Date.now() + 3300, true);
 });
 
