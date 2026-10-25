@@ -351,16 +351,17 @@ footer{ padding:clamp(70px,10vh,110px) var(--pad) calc(36px + var(--safe-b)); bo
 /* ============================================================
    EL ENCENDIDO — la animación de medianoche
    ============================================================ */
-/* últimos 10 segundos: la lámpara intenta prender */
+/* últimos 10 segundos: la lámpara se calienta poco a poco, sin cortes */
 .is-final .cd:last-child b{ color:var(--glow); animation:beat 1s ease-out infinite }
-@keyframes beat{ 0%{ transform:scale(1.12); text-shadow:0 0 28px rgba(240,162,74,.7) } 100%{ transform:none; text-shadow:none } }
-.is-final .cover__frame .lit{ animation:flicker 2.6s steps(1) infinite }
-@keyframes flicker{ 0%,100%{ opacity:0 } 8%{ opacity:.35 } 11%{ opacity:0 } 46%{ opacity:.18 } 49%{ opacity:0 } 71%{ opacity:.5 } 73%{ opacity:.1 } 76%{ opacity:0 } }
-.is-final .cover__halo{ opacity:.45; transition-duration:1s }
+@keyframes beat{ 0%{ transform:scale(1.08); text-shadow:0 0 28px rgba(240,162,74,.6) } 100%{ transform:none; text-shadow:none } }
+.is-final .cover__frame .lit{ opacity:.3; transition:opacity 9s linear }
+.is-final .cover__halo{ opacity:.5; transition:opacity 9s linear }
+/* al cargar ya encendida: sin transición de apagado → encendido */
+.boot .cover__frame .lit,.boot .hero__bg .lit,.boot .cover__halo{ transition:none!important }
 
 .launch{
   position:fixed; inset:0; z-index:100; display:none; place-items:center;
-  background:#030509; opacity:0; transition:opacity 700ms var(--ease);
+  background:#030509; opacity:0; transition:opacity 900ms ease-in-out;
   cursor:pointer; -webkit-tap-highlight-color:transparent;
 }
 .launch.on{ display:grid }
@@ -377,6 +378,34 @@ footer{ padding:clamp(70px,10vh,110px) var(--pad) calc(36px + var(--safe-b)); bo
   80%{ opacity:1 }
   100%{ opacity:0; transform:scale(.9); filter:blur(6px) }
 }
+/* slideshow del tracklist */
+.launch__track{ position:absolute; left:0; right:0; top:50%; transform:translateY(-50%); display:grid; place-items:center; pointer-events:none }
+.launch__track .slide{
+  grid-area:1/1; display:flex; flex-direction:column; align-items:center; gap:clamp(10px,2vh,18px);
+  text-align:center; padding:0 var(--pad); opacity:0;
+  animation:slide var(--d,600ms) linear forwards;
+}
+.launch__track .t{
+  font-variation-settings:"wdth" 125; font-weight:700; text-transform:uppercase;
+  font-size:clamp(1.7rem,7vw,5rem); line-height:.95; letter-spacing:-.025em; max-width:16ch;
+  color:var(--paper); text-shadow:0 0 40px rgba(7,10,18,.6);
+}
+.launch__track .single .t{ color:#FFD9A8; text-shadow:0 0 34px rgba(240,162,74,.6) }
+.launch__track .meta{ color:var(--paper); opacity:.75 }
+@keyframes slide{
+  0%  { opacity:0; transform:translateY(22px) scale(1.04); filter:blur(14px); letter-spacing:.06em }
+  24% { opacity:1; transform:none; filter:blur(0); letter-spacing:-.025em }
+  76% { opacity:1; transform:none; filter:blur(0) }
+  100%{ opacity:0; transform:translateY(-18px) scale(.98); filter:blur(8px) }
+}
+.launch__ticks{
+  position:absolute; left:50%; bottom:calc(64px + var(--safe-b)); transform:translateX(-50%);
+  display:flex; gap:6px; transition:opacity 700ms var(--ease);
+}
+.launch__ticks i{ width:clamp(10px,2.4vw,22px); height:2px; background:rgba(238,232,223,.16); transition:background 300ms, box-shadow 300ms }
+.launch__ticks i.on{ background:var(--glow); box-shadow:0 0 8px rgba(240,162,74,.8) }
+.launch__ticks.hide{ opacity:0 }
+
 .launch__word{
   position:relative; display:flex; align-items:baseline;
   font-variation-settings:"wdth" 125; font-weight:700; letter-spacing:-.04em;
@@ -389,7 +418,7 @@ footer{ padding:clamp(70px,10vh,110px) var(--pad) calc(36px + var(--safe-b)); bo
   display:inline-block; width:.2em; height:.2em; margin:0 .04em 0 .05em; background:#1a1d26;
   opacity:0; transition:opacity 900ms var(--ease), background 160ms, box-shadow 900ms var(--ease);
 }
-.launch__word span.show + i{ opacity:1 }
+.launch__word i.lit{ opacity:1 }
 .launch__word i.lit{ background:var(--glow); box-shadow:0 0 .35em .08em rgba(240,162,74,.75), 0 0 1.4em .3em rgba(240,162,74,.3) }
 .launch__word.leave{ opacity:0; transform:scale(1.06); filter:blur(8px) }
 .launch__sub{
@@ -411,7 +440,7 @@ footer{ padding:clamp(70px,10vh,110px) var(--pad) calc(36px + var(--safe-b)); bo
 .rv{ opacity:0; transform:translateY(24px); transition:opacity var(--base) var(--ease), transform var(--base) var(--ease) }
 .rv.in{ opacity:1; transform:none }
 .d1{ transition-delay:90ms } .d2{ transition-delay:180ms } .d3{ transition-delay:270ms }
-.no-js .rv{ opacity:1; transform:none }
+html:not(.js) .rv{ opacity:1; transform:none }
 
 @media (prefers-reduced-motion:reduce){
   html{ scroll-behavior:auto }
@@ -421,8 +450,17 @@ footer{ padding:clamp(70px,10vh,110px) var(--pad) calc(36px + var(--safe-b)); bo
   .cover__frame .lit,.hero__bg .lit,.cover__halo{ transition:opacity 300ms linear }
 }
 </style>
+<script>
+/* Antes del primer pintado: decide el estado para que la página no cargue "apagada" y luego cambie. */
+window.RELEASE_AT = "2026-10-25T00:00:00-06:00";   // medianoche CDMX
+(function(){
+  var c = document.documentElement.classList, t = new URLSearchParams(location.search).get("t");
+  c.add("js");
+  if(t === "out" || (t !== "pre" && t !== "launch" && Date.now() >= Date.parse(window.RELEASE_AT))) c.add("is-out", "boot");
+})();
+</script>
 </head>
-<body class="no-js">
+<body>
 
 <div class="grain" aria-hidden="true"></div>
 
@@ -430,6 +468,8 @@ footer{ padding:clamp(70px,10vh,110px) var(--pad) calc(36px + var(--safe-b)); bo
 <div class="launch" id="launch" aria-hidden="true">
   <canvas id="launchCv"></canvas>
   <div class="launch__count" id="launchCount"></div>
+  <div class="launch__track" id="launchTrack"></div>
+  <div class="launch__ticks" id="launchTicks"></div>
   <div class="launch__word" id="launchWord"><span>G</span><i></i><span>E</span><i></i><span>M</span><i></i></div>
   <p class="meta launch__sub" id="launchSub">Ya disponible</p>
   <button class="meta launch__skip" type="button" id="launchSkip">Saltar →</button>
@@ -683,7 +723,7 @@ footer{ padding:clamp(70px,10vh,110px) var(--pad) calc(36px + var(--safe-b)); bo
    DATOS — todo lo que cambia está aquí.
    Cuando Spotify publique el álbum, pega su link en SPOTIFY_ALBUM.
    ============================================================ */
-let RELEASE = new Date("2026-10-25T00:00:00-06:00");     // medianoche CDMX
+let RELEASE = new Date(window.RELEASE_AT);                // se define en <head>
 
 const LINKS = {
   spotifyArtist: "https://open.spotify.com/artist/7BhSQcfV9sFf2OWyV0TE2d",
@@ -707,7 +747,6 @@ const RELEASES = [
 ];
 
 /* ============================================================ */
-document.body.classList.remove("no-js");
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // ?t=pre / ?t=out para previsualizar ambos estados; ?t=launch simula la medianoche en 12 s
@@ -800,9 +839,11 @@ function tick(){
    t < 0      3 · 2 · 1
    0–900      el filamento parpadea, como foco de tungsteno
    700–2600   la luz florece; entran los listones de cristal líquido
-   1900–3400  G · E · M se arman y sus puntos se prenden uno por uno
-   4800       detrás del telón, la página pasa a "ya disponible"
-   5200–6900  la luz se abre desde la lámpara de la portada
+   2400–~9400 las 13 canciones pasan una por una (cada vez más rápido);
+              la luz late en cada cambio
+   GEM        G · E · M se arman y sus puntos se prenden uno por uno
+   SWITCH     detrás del telón, la página pasa a "ya disponible"
+   REVEAL     la luz se abre desde la lámpara de la portada y se funde
    ============================================================ */
 let launching = false;
 const L = {
@@ -811,7 +852,110 @@ const L = {
   count: document.getElementById("launchCount"),
   word: document.getElementById("launchWord"),
   sub: document.getElementById("launchSub"),
+  track: document.getElementById("launchTrack"),
+  ticks: document.getElementById("launchTicks"),
 };
+// las canciones salen del tracklist de la página
+const SONGS = [...document.querySelectorAll("#tracks li")].map(li=>({
+  t: li.querySelector(".t").textContent, single: li.classList.contains("single"),
+}));
+// tiempos: cada canción dura menos que la anterior (980 ms → 640 ms)
+const SL = 2400;
+const DURS = SONGS.map((_, i)=>Math.round(980 - i*340/(SONGS.length-1)));
+const STARTS = DURS.map((_, i)=>SL + DURS.slice(0,i).reduce((a,b)=>a+b, 0));
+const GEM = STARTS[STARTS.length-1] + DURS[DURS.length-1] + 200;
+const SWITCH = GEM + 2900, REVEAL = SWITCH + 400, END = REVEAL + 1750;
+
+/* ---------- una escena por canción: fondo (a centro, b orilla), color de acento c y su animación ---------- */
+const NIGHT = { a:[3,5,9], b:[3,5,9] };
+const SCENES = [
+  { a:[92,40,90],   b:[20,10,30], c:"255,140,110" },  // AFUERA — la sala, la subiste de volumen
+  { a:[150,95,30],  b:[35,18,8],  c:"255,205,120" },  // FULLER — algo que se llena
+  { a:[120,70,95],  b:[22,18,40], c:"255,190,205" },  // WHEN YOU STAY — círculos en la muñeca
+  { a:[30,18,70],   b:[5,4,14],   c:"255,80,200"  },  // DIFFERENT IN THE DARK — esas luces
+  { a:[110,10,120], b:[12,2,30],  c:"255,60,220"  },  // HYPER 98' — pixeles
+  { a:[40,60,95],   b:[8,12,24],  c:"255,230,200" },  // DE PASO — luces que pasan
+  { a:[110,15,30],  b:[20,3,8],   c:"255,90,90"   },  // PERDER LA VOZ — la voz se apaga
+  { a:[140,80,25],  b:[25,10,4],  c:"255,190,110" },  // ANTES DE HABLAR — el borde del vaso
+  { a:[90,92,150],  b:[14,16,40], c:"220,225,255" },  // WEIGHTLESS — sin peso
+  { a:[60,45,20],   b:[8,6,4],    c:"255,200,110" },  // ESE RATO — la luz puesta
+  { a:[15,90,85],   b:[3,18,20],  c:"120,255,220" },  // 11 — a little longer
+  { a:[92,70,50],   b:[22,16,10], c:"255,245,225" },  // SI ME OLVIDO — recuérdame así
+  { a:[20,48,79],   b:[5,8,16],   c:"240,162,74"  },  // G.E.M. — de vuelta al cuarto azul
+];
+const mixRGB = (x, y, k) => x.map((v,i)=>Math.round(v + (y[i]-v)*k));
+// peso de la escena i en el tiempo t: entra y sale con un cruce de ±XF ms alrededor de cada cambio
+const XF = 170;
+const smooth = v => (v = clamp01(v), v*v*(3 - 2*v));
+function sceneWeight(i, t){
+  const s = STARTS[i], e = s + DURS[i], last = i === SCENES.length - 1;
+  const win  = i === 0 ? (t >= s ? 1 : 0) : smooth((t - (s - XF)) / (2*XF));
+  const wout = last ? 1 : 1 - smooth((t - (e - XF)) / (2*XF));
+  return win * wout;
+}
+const SEED = Array.from({length:80}, ()=>[Math.random(), Math.random(), Math.random()]);
+const TAU = Math.PI*2;
+const fr = v => ((v % 1) + 1) % 1;   // parte fraccionaria, también para valores negativos (la escena entra antes de su inicio)
+const MOTIFS = [
+  // AFUERA: ondas de sonido que se abren
+  (x,p,t,W,H,cx,cy,c,e)=>{ const M = Math.max(W,H)*.6;
+    for(let k=0;k<5;k++){ const r = fr(p*1.1 + k/5)*M; x.strokeStyle=`rgba(${c},${.45*e*(1-r/M)})`; x.lineWidth=2; x.beginPath(); x.arc(cx,cy,r,0,TAU); x.stroke(); } },
+  // FULLER: se va llenando
+  (x,p,t,W,H,cx,cy,c,e)=>{ const lvl = H - easeOut(p)*H*.62; x.fillStyle=`rgba(${c},${.22*e})`; x.beginPath(); x.moveTo(0,H);
+    for(let X=0;X<=W;X+=20) x.lineTo(X, lvl + Math.sin(X*.012 + t*.005)*12); x.lineTo(W,H); x.fill();
+    x.strokeStyle=`rgba(${c},${.6*e})`; x.lineWidth=1.5; x.beginPath(); for(let X=0;X<=W;X+=20) X?x.lineTo(X, lvl + Math.sin(X*.012 + t*.005)*12):x.moveTo(0,lvl); x.stroke(); },
+  // WHEN YOU STAY: círculos que se dibujan solos
+  (x,p,t,W,H,cx,cy,c,e)=>{ const R = Math.min(W,H)*.3;
+    for(let k=0;k<3;k++){ x.strokeStyle=`rgba(${c},${(.55-.15*k)*e})`; x.lineWidth=2; x.beginPath();
+      x.arc(cx + k*14, cy - k*10, R*(1-.14*k), -Math.PI/2 + k, -Math.PI/2 + k + easeOut(p*1.15)*TAU*1.05); x.stroke(); } },
+  // DIFFERENT IN THE DARK: reflectores de colores
+  (x,p,t,W,H,cx,cy,c,e)=>{ ["255,80,200","90,200,255","170,110,255"].forEach((col,k)=>{
+      const ox = W*(.2 + .3*k), ang = Math.sin(t*.0022 + k*2)*.55, L = H*1.3, s = .2;
+      const g = x.createLinearGradient(ox,0,ox,L); g.addColorStop(0,`rgba(${col},${.32*e})`); g.addColorStop(1,`rgba(${col},0)`);
+      x.fillStyle=g; x.beginPath(); x.moveTo(ox,-10); x.lineTo(ox + Math.sin(ang-s)*L, Math.cos(ang-s)*L); x.lineTo(ox + Math.sin(ang+s)*L, Math.cos(ang+s)*L); x.fill(); }); },
+  // HYPER 98': cuadrícula de pixeles que late
+  (x,p,t,W,H,cx,cy,c,e)=>{ const s = W < 700 ? 22 : 30;
+    for(let i=0;i*s<W;i++) for(let j=0;j*s<H;j++){ const a = .5 + .5*Math.sin(t*.006 + i*.7 + j*1.3 + Math.sin(i*j));
+      if(a > .55){ x.fillStyle=`rgba(${c},${.16*a*e})`; x.fillRect(i*s+1, j*s+1, s-2, s-2); } } },
+  // DE PASO: luces que pasan de largo
+  (x,p,t,W,H,cx,cy,c,e)=>{ for(let k=0;k<16;k++){ const [r1,r2,r3] = SEED[k];
+      const X = fr(p*(1.2+r3) + r1)*(W+500) - 250, Y = H*(.2 + .6*r2), L = 120 + 200*r3;
+      const col = k % 3 ? c : "255,70,60";
+      const g = x.createLinearGradient(X-L,0,X,0); g.addColorStop(0,`rgba(${col},0)`); g.addColorStop(1,`rgba(${col},${.7*e})`);
+      x.strokeStyle=g; x.lineWidth = 1.5 + 2*r1; x.beginPath(); x.moveTo(X-L,Y); x.lineTo(X,Y); x.stroke(); } },
+  // PERDER LA VOZ: la onda de la voz se va apagando
+  (x,p,t,W,H,cx,cy,c,e)=>{ const A = H*.16*(1-easeInOut(p));
+    for(let k=0;k<3;k++){ x.strokeStyle=`rgba(${c},${(.6-.18*k)*e})`; x.lineWidth=2-k*.5; x.beginPath();
+      for(let X=0;X<=W;X+=6){ const y = cy + H*.2 + A*Math.sin(X*.035 + t*.018 + k)*Math.sin(X/W*Math.PI)*(.7+.3*Math.sin(X*.007-t*.004)); X?x.lineTo(X,y):x.moveTo(X,y); } x.stroke(); } },
+  // ANTES DE HABLAR: dedos sobre el borde del vaso, ondas en el líquido
+  (x,p,t,W,H,cx,cy,c,e)=>{ for(let k=0;k<5;k++){ const [r1,r2] = SEED[20+k]; const ph = fr(p*2.2 + k*.2);
+      const X = W*(.15 + .7*r1), Y = H*(.25 + .55*r2), r = ph*Math.min(W,H)*.22;
+      x.strokeStyle=`rgba(${c},${.55*e*(1-ph)})`; x.lineWidth=1.6; x.beginPath(); x.ellipse(X,Y,r,r*.36,0,0,TAU); x.stroke(); } },
+  // WEIGHTLESS: todo flota hacia arriba
+  (x,p,t,W,H,cx,cy,c,e)=>{ for(let k=0;k<60;k++){ const [r1,r2,r3] = SEED[k];
+      const Y = H - (((t*.00008*(1+r3)) + r2) % 1)*H*1.1, X = W*r1 + Math.sin(t*.0015 + k)*14;
+      x.fillStyle=`rgba(${c},${(.25 + .4*r3)*e})`; x.beginPath(); x.arc(X,Y,1.5 + 4*r3,0,TAU); x.fill(); } },
+  // ESE RATO: la puerta con la luz puesta
+  (x,p,t,W,H,cx,cy,c,e)=>{ const w = 6 + easeOut(p)*Math.min(W*.28,220), h = H*.62, X = cx - w/2, Y = cy - h*.45;
+    for(let k=3;k>=0;k--){ const pad = k*26; x.fillStyle=`rgba(${c},${(k ? .05 : .22)*e})`; x.fillRect(X-pad, Y-pad, w+pad*2, h+pad*2); }
+    const g = x.createLinearGradient(0,Y+h,0,H); g.addColorStop(0,`rgba(${c},${.18*e})`); g.addColorStop(1,`rgba(${c},0)`);
+    x.fillStyle=g; x.beginPath(); x.moveTo(X,Y+h); x.lineTo(X+w,Y+h); x.lineTo(X+w*2.4,H); x.lineTo(X-w*1.4,H); x.fill(); },
+  // 11: dos líneas que se acercan, un rato más
+  (x,p,t,W,H,cx,cy,c,e)=>{ const gap = Math.min(W*.3,240)*(1-.75*easeOut(p)) + 18;
+    [-1,1].forEach(sd=>{ const X = cx + sd*gap; for(const [lw,a] of [[14,.08],[5,.22],[2,.75]]){
+      x.strokeStyle=`rgba(${c},${a*e})`; x.lineWidth=lw; x.beginPath(); x.moveTo(X, cy - H*.32); x.lineTo(X, cy + H*.32); x.stroke(); } }); },
+  // SI ME OLVIDO: polaroids, como recuerdos
+  (x,p,t,W,H,cx,cy,c,e)=>{ const S = Math.min(W,H)*.26;
+    [[-.28,-.12,-.18],[.27,.08,.14],[0,.22,-.05]].forEach(([dx,dy,rot],k)=>{ const a = clamp01((p - k*.18)/.15)*e; if(!a) return;
+      x.save(); x.translate(cx + dx*W, cy + dy*H); x.rotate(rot);
+      x.fillStyle=`rgba(${c},${.07*a})`; x.fillRect(-S/2,-S*.6,S,S*1.2);
+      x.strokeStyle=`rgba(${c},${.55*a})`; x.lineWidth=3; x.strokeRect(-S/2,-S*.6,S,S*1.2);
+      x.fillStyle=`rgba(${c},${.12*a})`; x.fillRect(-S/2+8,-S*.6+8,S-16,S*.88); x.restore(); }); },
+  // G.E.M.: regresa la lámpara
+  (x,p,t,W,H,cx,cy,c,e)=>{ const R = Math.max(W,H)*(.2 + .5*easeOut(p));
+    const g = x.createRadialGradient(cx,cy,0,cx,cy,R); g.addColorStop(0,`rgba(${c},${.5*e})`); g.addColorStop(1,`rgba(${c},0)`);
+    x.fillStyle=g; x.fillRect(0,0,W,H); },
+];
 const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
 const easeOut = v => 1 - Math.pow(1 - clamp01(v), 3);
 const easeInOut = v => (v = clamp01(v), v < .5 ? 4*v*v*v : 1 - Math.pow(-2*v + 2, 3)/2);
@@ -850,11 +994,15 @@ function startLaunch(zeroAt, replay = false){
   letters.forEach(s=>s.classList.remove("show"));
   dots.forEach(d=>d.classList.remove("lit"));
   L.word.classList.remove("leave"); L.sub.classList.remove("show");
-  L.count.innerHTML = "";
+  L.count.innerHTML = ""; L.track.innerHTML = "";
+  L.ticks.innerHTML = SONGS.map(()=>"<i></i>").join(""); L.ticks.classList.add("hide");
+  const ticks = [...L.ticks.children];
+  let slideIdx = -1;
   L.el.style.webkitMaskImage = L.el.style.maskImage = "none";
 
   L.el.classList.add("on");
-  requestAnimationFrame(()=>L.el.classList.add("vis"));
+  void L.el.offsetWidth;            // fuerza el estado inicial para que la entrada se funda, no corte
+  L.el.classList.add("vis");
   if(replay) setTimeout(()=>{ if(launching){ root.classList.remove("is-out"); } }, 750);
 
   function filament(t){
@@ -880,9 +1028,33 @@ function startLaunch(zeroAt, replay = false){
       return;
     }
 
-    const f = filament(t);
+    // escenas de las canciones: cada una entra y sale con un cruce suave centrado en el cambio,
+    // así en cada frontera conviven dos (sus pesos siempre suman 1)
+    let idx = -1;
+    for(let i = STARTS.length-1; i >= 0; i--) if(t >= STARTS[i]){ idx = i; break; }
+    const sm = t < GEM ? easeInOut((t-SL)/450) : 1 - easeInOut((t-GEM)/800);   // cuánto mandan las canciones sobre la lámpara
+    if(sm > 0 && idx >= 0){
+      const live = [idx-1, idx, idx+1].filter(i => i >= 0 && i < SCENES.length)
+        .map(i => [i, sceneWeight(i, t)]).filter(([,w]) => w > 0.001);
+      let A = [0,0,0], B = [0,0,0], tot = 0;
+      live.forEach(([i,w]) => { A = A.map((v,j)=>v + SCENES[i].a[j]*w); B = B.map((v,j)=>v + SCENES[i].b[j]*w); tot += w; });
+      A = mixRGB(NIGHT.a, A.map(v=>v/tot), sm); B = mixRGB(NIGHT.b, B.map(v=>v/tot), sm);
+      ctx.globalCompositeOperation = "source-over";
+      const bg = ctx.createRadialGradient(cx,cy,0,cx,cy,Math.max(W,H)*.75);
+      bg.addColorStop(0,`rgb(${A})`); bg.addColorStop(1,`rgb(${B})`);
+      ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
+      ctx.globalCompositeOperation = "lighter";
+      live.forEach(([i,w]) => MOTIFS[i](ctx, (t - STARTS[i]) / DURS[i], t, W, H, cx, cy, SCENES[i].c, w * sm));
+    }
+    const lampK = 1 - .72*Math.max(0, sm);   // durante las canciones la lámpara se hace a un lado
+
+    // en cada cambio de canción la luz respira: sube y baja suave, sin destello
+    let kick = 0;
+    for(const s of STARTS){ const d = (t - s)/200; kick = Math.max(kick, Math.exp(-d*d)); }
+    if(t >= GEM) kick *= 1 - smooth((t - GEM)/300);
+    const f = filament(t) * (1 + .22*kick);
     const bloom = easeOut((t-700)/1900);
-    const fade = 1 - easeInOut((t-5000)/1600);
+    const fade = (1 - .3*easeInOut((t-REVEAL)/1500)) * (1 + .25*kick) * lampK;   // la luz no se apaga: se convierte en la página
 
     // halo grande
     const R = 40 + bloom*Math.max(W,H)*.85;
@@ -895,7 +1067,7 @@ function startLaunch(zeroAt, replay = false){
 
     // filamento (cede cuando entran las letras)
     const core = ctx.createRadialGradient(cx,cy,0,cx,cy,26 + 50*bloom);
-    core.addColorStop(0,`rgba(255,240,215,${f*fade*(1 - .55*easeOut((t-1800)/900))})`); core.addColorStop(1,"rgba(255,200,130,0)");
+    core.addColorStop(0,`rgba(255,240,215,${f*fade*(1 - .55*easeOut((t-1800)/900))*(1 - Math.max(0,sm))})`); core.addColorStop(1,"rgba(255,200,130,0)");
     ctx.fillStyle = core; ctx.beginPath(); ctx.arc(cx,cy,26 + 50*bloom,0,Math.PI*2); ctx.fill();
 
     // listones de cristal líquido
@@ -940,14 +1112,39 @@ function startLaunch(zeroAt, replay = false){
       L.count.innerHTML = n > 0 && n <= 3 ? `<span>${n}</span>` : "";
     }
 
+    // slideshow: una canción a la vez
+    let idx = -1;
+    for(let i = STARTS.length-1; i >= 0; i--) if(t >= STARTS[i]){ idx = i; break; }
+    if(t >= GEM) idx = SONGS.length;
+    if(idx !== slideIdx){
+      slideIdx = idx;
+      if(idx >= 0 && idx < SONGS.length){
+        // la nueva entra mientras la anterior termina de salir (se quita sola al acabar su animación)
+        const s = SONGS[idx];
+        const el = document.createElement("div");
+        el.className = "slide" + (s.single ? " single" : "");
+        el.style.setProperty("--d", `${DURS[idx] + 260}ms`);
+        el.innerHTML = `<span class="meta">${pad(idx+1)} / ${SONGS.length}</span><span class="t">${s.t}</span>`;
+        el.addEventListener("animationend", ()=>el.remove());
+        L.track.appendChild(el);
+        L.ticks.classList.remove("hide");
+        ticks.forEach((k,i)=>k.classList.toggle("on", i <= idx));
+      } else if(idx >= SONGS.length){
+        ticks.forEach(k=>k.classList.add("on"));
+      }
+    }
+
     // G · E · M
-    [1900,2150,2400].forEach((ms,i)=>{ if(t >= ms) letters[i].classList.add("show"); });
-    [2750,3000,3250].forEach((ms,i)=>{ if(t >= ms) dots[i].classList.add("lit"); });
-    if(t >= 3700) L.sub.classList.add("show");
+    [0,250,500].forEach((ms,i)=>{ if(t >= GEM+ms) letters[i].classList.add("show"); });
+    [850,1100,1350].forEach((ms,i)=>{ if(t >= GEM+ms) dots[i].classList.add("lit"); });
+    if(t >= GEM+1800) L.sub.classList.add("show");
+    // la palabra se despide antes de abrir la luz, para no encimarse con la de la página
+    if(t >= SWITCH - 600){ L.word.classList.add("leave"); L.sub.classList.remove("show"); }
 
     // detrás del telón: la página se enciende
-    if(t >= 4800 && !switched){
+    if(t >= SWITCH && !switched){
       switched = true;
+      L.ticks.classList.add("hide");
       scrollTo({top:0, behavior:"instant"});
       setOut(true);
       document.getElementById("live").textContent = "G.E.M. ya está disponible.";
@@ -957,19 +1154,23 @@ function startLaunch(zeroAt, replay = false){
       const lx = c.left + c.width*.44, ly = c.top + c.height*.53;
       origin = (ly > 0 && ly < innerHeight) ? [lx/innerWidth*100, ly/innerHeight*100] : [50,50];
     }
-    if(t >= 5200 && origin){
-      const r = -14 + easeInOut((t-5200)/1700)*175;
-      const m = `radial-gradient(circle at ${origin[0]}% ${origin[1]}%, transparent ${r}%, #000 ${r+14}%)`;
+    if(t >= REVEAL && origin){
+      // borde suave + disolvencia: la luz se abre desde la lámpara y se funde con la página encendida
+      const r = -40 + easeInOut((t-REVEAL)/1500)*200;
+      const m = `radial-gradient(circle at ${origin[0]}% ${origin[1]}%, transparent ${r}%, #000 ${r+40}%)`;
       L.el.style.webkitMaskImage = L.el.style.maskImage = m;
+      L.el.style.transition = "none";
+      L.el.style.opacity = String(1 - easeInOut((t-REVEAL-300)/1200));
     }
     draw(t);
-    if(t >= 6950) return end();
+    if(t >= END) return end();
     requestAnimationFrame(frame);
   }
 
   function end(){
     launching = false;
     L.el.classList.remove("on","vis");
+    L.el.style.opacity = L.el.style.transition = "";
     removeEventListener("resize", size);
     removeEventListener("keydown", onKey);
     L.el.removeEventListener("click", skip);
@@ -977,8 +1178,8 @@ function startLaunch(zeroAt, replay = false){
   }
   function skip(){
     const t = Date.now() - zero;
-    if(t < 4600) zero = Date.now() - 4600;
-    if(t < 1900){ letters.forEach(s=>s.classList.add("show")); dots.forEach(d=>d.classList.add("lit")); }
+    if(t < SWITCH - 200) zero = Date.now() - (SWITCH - 200);
+    if(t < GEM){ letters.forEach(s=>s.classList.add("show")); dots.forEach(d=>d.classList.add("lit")); }
   }
   function onKey(e){ if(e.key === "Escape") skip(); }
   L.el.addEventListener("click", skip);
@@ -1001,11 +1202,13 @@ function clock(){
 }
 clock(); setInterval(clock, 30000);
 
-/* ---------- reveals ---------- */
+/* ---------- reveals: esperan a la tipografía para no mostrar la fuente provisional ---------- */
 const io = new IntersectionObserver(es=>{
   es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } });
 },{ rootMargin:"0px 0px -10% 0px", threshold:.06 });
-document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+Promise.race([document.fonts ? document.fonts.ready : Promise.resolve(), new Promise(r=>setTimeout(r,1200))])
+  .then(()=>document.querySelectorAll(".rv").forEach(el=>io.observe(el)));
+requestAnimationFrame(()=>requestAnimationFrame(()=>root.classList.remove("boot")));
 
 /* ---------- la luz recorre el tracklist ---------- */
 const rows = [...document.querySelectorAll("#tracks li")];
