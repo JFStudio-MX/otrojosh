@@ -283,6 +283,21 @@ html.reduce .rv{opacity:1!important;transform:none!important;transition:none}
 .previa button{font:500 11px/1 var(--f-m);letter-spacing:.06em;padding:7px 9px;border:1px solid var(--line2);border-radius:999px}
 .previa button.on{background:var(--ink);color:#050608}
 .previa .x{position:absolute;top:8px;right:10px;border:0;padding:4px;color:var(--dim)}
+
+/* ---- AFTERIMAGE: la serie ---- */
+.ai-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,210px),1fr));gap:clamp(16px,2vw,26px);margin-top:48px}
+.ai-c{display:flex;flex-direction:column;gap:14px}
+.ai-i{aspect-ratio:1;background:#0b0d11;border:1px solid var(--line);overflow:hidden;position:relative}
+.ai-i img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.9) brightness(.88);transition:filter .5s ease,transform .8s ease}
+.ai-c:hover .ai-i img{filter:none;transform:scale(1.03)}
+.ai-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:800 22px/1 var(--f-d);font-stretch:125%;letter-spacing:.04em;color:var(--mute)}
+.ai-t h3{margin:6px 0 2px;font:800 clamp(17px,1.6vw,21px)/1.1 var(--f-d);font-stretch:110%;text-transform:uppercase}
+.ai-s{color:var(--soft)}
+.ai-e{display:inline-block;margin-top:8px;padding:4px 9px;border:1px solid var(--line2);border-radius:999px}
+.ai-c.on .ai-e{background:var(--ink);border-color:var(--ink);color:#050608}
+.ai-c:not(.on) .ai-i{opacity:.72}
+.ai-alb{margin-top:56px;padding-top:28px;border-top:1px solid var(--line)}
+.ai-alb__t{margin:10px 0 18px;color:var(--soft);max-width:52ch}
 </style>
 </head>
 <body>
@@ -308,6 +323,7 @@ html.reduce .rv{opacity:1!important;transform:none!important;transition:none}
     <a class="logo" href="#top">OTRO JOSH</a>
     <div class="nav__r">
       <a href="#musica" id="navMusica">Lo nuevo</a>
+      <a href="#afterimage">AFTERIMAGE</a>
       <a href="#discos">Discos</a>
       <a href="#videos">Videos</a>
       <a href="#bio">Bio</a>
@@ -360,6 +376,37 @@ html.reduce .rv{opacity:1!important;transform:none!important;transition:none}
         <div>
           <ol class="tl rv" id="tl"></ol>
           <div class="acts rv"><a class="btn btn--on" id="albumBtn" href="#" target="_blank" rel="noopener">Pre-save ↗</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AFTERIMAGE: la serie ============ -->
+  <section class="sec" id="afterimage">
+    <div class="wrap">
+      <div class="sec__head">
+        <p class="meta rv">Serie · 10 capítulos · 31 oct – 18 dic</p>
+        <h2 class="h2 rv">AFTERIMAGE.</h2>
+        <p class="sec__sub rv">Un cometa, cinco minutos y diez historias de la misma noche. Cada miércoles y viernes sale un capítulo, y su canción, el mismo día.</p>
+      </div>
+      <div class="ai-g" id="aiG">
+<article class="ai-c rv" data-f="2026-10-31"><div class="ai-i"><img src="assets/afterimage/01.jpg" alt="Portada de REFLEX." loading="lazy" width="640" height="640"></div><div class="ai-t"><p class="meta">Capítulo 1 · Sáb 31 oct</p><h3>¿Llegó?</h3><p class="meta ai-s">REFLEX</p><span class="ai-e meta"></span></div></article>
+<article class="ai-c rv" data-f="2026-11-04"><div class="ai-i"><img src="assets/afterimage/02.jpg" alt="Portada de INCÓGNITA." loading="lazy" width="640" height="640"></div><div class="ai-t"><p class="meta">Capítulo 2 · Mié 4 nov</p><h3>La del sótano</h3><p class="meta ai-s">INCÓGNITA</p><span class="ai-e meta"></span></div></article>
+<article class="ai-c rv" data-f="2026-11-06"><div class="ai-i"><img src="assets/afterimage/03.jpg" alt="Portada de DISCO VISTA." loading="lazy" width="640" height="640"></div><div class="ai-t"><p class="meta">Capítulo 3 · Vie 6 nov</p><h3>Los de la barra</h3><p class="meta ai-s">DISCO VISTA</p><span class="ai-e meta"></span></div></article>
+<article class="ai-c rv" data-f="2026-11-11"><div class="ai-i"><img src="assets/afterimage/04.jpg" alt="Portada de COAT CHECK." loading="lazy" width="640" height="640"></div><div class="ai-t"><p class="meta">Capítulo 4 · Mié 11 nov</p><h3>Los de la puerta</h3><p class="meta ai-s">COAT CHECK</p><span class="ai-e meta"></span></div></article>
+<article class="ai-c rv" data-f="2026-11-13"><div class="ai-i"><img src="assets/afterimage/05.jpg" alt="Portada de BUZZ." loading="lazy" width="640" height="640"></div><div class="ai-t"><p class="meta">Capítulo 5 · Vie 13 nov</p><h3>Los del techo del coche</h3><p class="meta ai-s">BUZZ</p><span class="ai-e meta"></span></div></article>
+<article class="ai-c rv" data-f="2026-11-18"><div class="ai-i"><img src="assets/afterimage/06.jpg" alt="Portada de KEEPSAKE." loading="lazy" width="640" height="640"></div><div class="ai-t"><p class="meta">Capítulo 6 · Mié 18 nov</p><h3>La de la chamarra</h3><p class="meta ai-s">KEEPSAKE</p><span class="ai-e meta"></span></div></article>
+<article class="ai-c rv" data-f="2026-11-20"><div class="ai-i"><img src="assets/afterimage/07.jpg" alt="Portada de EXIT SIGN." loading="lazy" width="640" height="640"></div><div class="ai-t"><p class="meta">Capítulo 7 · Vie 20 nov</p><h3>La del letrero</h3><p class="meta ai-s">EXIT SIGN</p><span class="ai-e meta"></span></div></article>
+<article class="ai-c rv" data-f="2026-11-25"><div class="ai-i"><img src="assets/afterimage/08.jpg" alt="Portada de VENT (HÄRTER)." loading="lazy" width="640" height="640"></div><div class="ai-t"><p class="meta">Capítulo 8 · Mié 25 nov</p><h3>El que vino a sacarlo</h3><p class="meta ai-s">VENT (HÄRTER)</p><span class="ai-e meta"></span></div></article>
+<article class="ai-c rv" data-f="2026-12-16"><div class="ai-i"><img src="assets/afterimage/09.jpg" alt="Portada de AFTERIMAGE." loading="lazy" width="640" height="640"></div><div class="ai-t"><p class="meta">Capítulo 9 · Mié 16 dic</p><h3>Los cinco minutos</h3><p class="meta ai-s">AFTERIMAGE</p><span class="ai-e meta"></span></div></article>
+<article class="ai-c rv" data-f="2026-12-18"><div class="ai-i"><span class="ai-ph" aria-hidden="true">BLUE HOUR</span></div><div class="ai-t"><p class="meta">Capítulo 10 · Vie 18 dic</p><h3>Cinco minutos después</h3><p class="meta ai-s">BLUE HOUR</p><span class="ai-e meta"></span></div></article>
+      </div>
+      <div class="ai-alb rv">
+        <p class="meta">El álbum · 18 dic</p>
+        <p class="ai-alb__t">AFTERIMAGE completo, con las diez canciones, sale junto al último capítulo.</p>
+        <div class="acts">
+          <a class="btn" href="https://open.spotify.com/artist/7BhSQcfV9sFf2OWyV0TE2d" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-spotify"/></svg>Spotify ↗</a>
+          <a class="btn" href="https://www.youtube.com/@OtroJosh" target="_blank" rel="noopener">Los capítulos en YouTube ↗</a>
         </div>
       </div>
     </div>
@@ -1265,6 +1312,16 @@ if (M.previa) window.OJ_DEBUG = () => ({ sonido, estado: ac && ac.state, dom, so
 if (M.previa && params.get("ir")) { const el = document.getElementById(params.get("ir")); if (el) setTimeout(() => el.scrollIntoView({ behavior: "instant", block: "start" }), 300); }
 if (document.fonts && document.fonts.load) Promise.all([document.fonts.load('900 40px "Anybody"'), document.fonts.load('500 12px "Geist Mono"')])
   .then(() => { pintarPortadas(); ajustar($(".cap__l.on")); }, () => {});
+})();
+</script>
+
+<script>
+(function () {
+  var hoy = new Date(); var iso = hoy.getFullYear() + "-" + String(hoy.getMonth() + 1).padStart(2, "0") + "-" + String(hoy.getDate()).padStart(2, "0");
+  document.querySelectorAll("#aiG .ai-c").forEach(function (c) {
+    var salio = c.dataset.f <= iso; c.classList.toggle("on", salio);
+    c.querySelector(".ai-e").textContent = salio ? "Ya salió" : "Próximamente";
+  });
 })();
 </script>
 </body>
