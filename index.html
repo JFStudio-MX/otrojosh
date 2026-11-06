@@ -298,6 +298,33 @@ html.reduce .rv{opacity:1!important;transform:none!important;transition:none}
 .ai-c:not(.on) .ai-i{opacity:.72}
 .ai-alb{margin-top:56px;padding-top:28px;border-top:1px solid var(--line)}
 .ai-alb__t{margin:10px 0 18px;color:var(--soft);max-width:52ch}
+
+/* ---- portada AFTERIMAGE (reemplaza al loop mientras dura la serie) ---- */
+#cv,.hero>.hud,#navMusica,#musica{display:none!important}
+.aih{position:absolute;inset:0;z-index:2}
+.aih__bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%;animation:aihZ 40s ease-in-out infinite alternate;transform-origin:60% 30%}
+@keyframes aihZ{from{transform:scale(1.02)}to{transform:scale(1.1)}}
+html.reduce .aih__bg img{animation:none}
+.aih::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(to right,rgba(3,4,5,.82) 0%,rgba(3,4,5,.5) 38%,rgba(3,4,5,0) 66%),
+             linear-gradient(to top,rgba(3,4,5,.92) 0%,rgba(3,4,5,.3) 42%,rgba(3,4,5,0) 62%)}
+.aih__in{position:absolute;z-index:2;left:0;right:0;bottom:0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px 56px;align-items:end;
+  padding:0 var(--gut) calc(clamp(24px,5vh,56px) + env(safe-area-inset-bottom))}
+.aih__txt{min-width:0;max-width:760px}
+.aih__t{margin:0;font:900 clamp(38px,min(6.6vw,15vh),150px)/.86 var(--f-d);font-stretch:125%;letter-spacing:-.012em;text-transform:uppercase}
+.aih__s{margin:18px 0 0;max-width:40ch;font:400 clamp(16px,1.3vw,19px)/1.45 var(--f-t);color:var(--soft)}
+.aih__cap{margin:20px 0 0;font:500 clamp(13px,1vw,15px)/1.4 var(--f-m);letter-spacing:.06em;color:var(--ink)}
+.aih__cap b{font-weight:700}
+.aih__cap span{color:var(--dim)}
+.aih__cv{margin:0;display:grid;gap:10px;justify-items:end;text-align:right}
+.aih__cv video{width:clamp(170px,16vw,250px);aspect-ratio:9/16;object-fit:cover;background:#0b0d11;border:1px solid var(--line2);border-radius:10px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.aih__cv figcaption{max-width:250px;color:var(--soft)}
+@media (max-width:760px){
+  .aih__in{grid-template-columns:minmax(0,1fr)}
+  .aih__t{font-size:10.4vw}
+  .aih__cv{display:none}
+  .aih::after{background:linear-gradient(to top,rgba(3,4,5,.95) 0%,rgba(3,4,5,.55) 48%,rgba(3,4,5,.1) 72%)}
+}
 </style>
 </head>
 <body>
@@ -318,6 +345,31 @@ html.reduce .rv{opacity:1!important;transform:none!important;transition:none}
 <header class="hero" id="top">
   <canvas id="cv" aria-hidden="true"></canvas>
   <div class="grain" aria-hidden="true"></div>
+
+  <!-- ============ PORTADA: AFTERIMAGE (el capítulo y la fecha se calculan solos) ============ -->
+  <div class="aih" id="aih">
+    <picture class="aih__bg" aria-hidden="true">
+      <source media="(max-width:760px)" srcset="assets/afterimage/hero-m.jpg">
+      <img src="assets/afterimage/hero.jpg" alt="" width="2000" height="1125" fetchpriority="high">
+    </picture>
+    <div class="aih__in">
+      <div class="aih__txt">
+        <p class="lab"><span class="dot" aria-hidden="true"></span><span class="meta" id="aihEy">Serie · 10 capítulos</span></p>
+        <h2 class="aih__t">AFTERIMAGE</h2>
+        <p class="aih__s">Un cometa, cinco minutos y diez historias de la misma noche. Cada capítulo sale con su canción, miércoles y viernes.</p>
+        <p class="aih__cap" id="aihCap"></p>
+        <div class="acts">
+          <a class="btn btn--on" id="aihVer" href="https://www.youtube.com/@OtroJosh" target="_blank" rel="noopener">Ver el capítulo ↗</a>
+          <a class="btn" href="https://open.spotify.com/artist/7BhSQcfV9sFf2OWyV0TE2d" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-spotify"/></svg>Spotify ↗</a>
+          <a class="btn" href="#afterimage">Los 10 capítulos ↓</a>
+        </div>
+      </div>
+      <figure class="aih__cv">
+        <video id="aihV" muted loop playsinline autoplay preload="auto" aria-label="Canvas de la canción del capítulo"></video>
+        <figcaption class="meta" id="aihProx"></figcaption>
+      </figure>
+    </div>
+  </div>
 
   <nav class="nav" aria-label="Principal">
     <a class="logo" href="#top">OTRO JOSH</a>
@@ -1322,6 +1374,29 @@ if (document.fonts && document.fonts.load) Promise.all([document.fonts.load('900
     var salio = c.dataset.f <= iso; c.classList.toggle("on", salio);
     c.querySelector(".ai-e").textContent = salio ? "Ya salió" : "Próximamente";
   });
+})();
+</script>
+
+<script>
+/* Portada AFTERIMAGE: el último capítulo que ya salió y el siguiente, según la fecha (hora de CDMX). */
+(function () {
+  var CAPS = [
+    ["2026-10-31", "¿Llegó?", "REFLEX"], ["2026-11-04", "La del sótano", "INCÓGNITA"], ["2026-11-06", "Los de la barra", "DISCO VISTA"],
+    ["2026-11-11", "Los de la puerta", "COAT CHECK"], ["2026-11-13", "Los del techo del coche", "BUZZ"], ["2026-11-18", "La de la chamarra", "KEEPSAKE"],
+    ["2026-11-20", "La del letrero", "EXIT SIGN"], ["2026-11-25", "El que vino a sacarlo", "VENT (HÄRTER)"], ["2026-12-16", "Los cinco minutos", "AFTERIMAGE"],
+    ["2026-12-18", "Cinco minutos después", "BLUE HOUR"]];
+  var DIAS = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"], MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+  function fecha(iso) { var d = new Date(iso + "T12:00:00Z"); return DIAS[d.getUTCDay()] + " " + d.getUTCDate() + " " + MESES[d.getUTCMonth()]; }
+  var t = new Date(Date.now() - 6 * 36e5), hoy = t.toISOString().slice(0, 10);
+  var cur = 0; CAPS.forEach(function (c, i) { if (c[0] <= hoy) cur = i; });
+  var sig = CAPS[cur + 1], c = CAPS[cur], n = cur + 1, todo = cur === CAPS.length - 1;
+  var esc = function (x) { return x.replace(/&/g, "&amp;").replace(/</g, "&lt;"); };
+  document.getElementById("aihEy").textContent = todo ? "Serie completa · el álbum ya salió" : "Serie · Capítulo " + n + " de 10 ya salió";
+  document.getElementById("aihCap").innerHTML = "<b>Capítulo " + n + " · " + esc(c[1]) + "</b> <span>· " + esc(c[2]) + "</span>";
+  document.getElementById("aihProx").textContent = sig ? "Siguiente: capítulo " + (n + 1) + " · " + sig[2] + " · " + fecha(sig[0]) : "AFTERIMAGE, el álbum, ya disponible";
+  var v = document.getElementById("aihV"), k = String(n).padStart(2, "0");
+  v.poster = "assets/afterimage/canvas/" + k + ".jpg"; v.src = "assets/afterimage/canvas/" + k + ".mp4";
+  if (document.documentElement.classList.contains("reduce")) v.removeAttribute("autoplay"); else { var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); }
 })();
 </script>
 </body>
